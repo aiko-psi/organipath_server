@@ -9,24 +9,21 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
-@Table(name = "tasks")
+@Table(name = "projects")
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"},
         allowGetters = true)
-public class Task {
+
+public class Project {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotBlank
     private String name;
 
-    private String notes;
+    private boolean privacy;
 
 
     @Column(nullable = false, updatable = false)
@@ -39,19 +36,12 @@ public class Task {
     @LastModifiedDate
     private Date updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private Project project;
-
-
-    public Long getId() {
+    public Long getProjectId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setProjectId(Long projectId) {
+        this.id = projectId;
     }
 
     public String getName() {
@@ -62,12 +52,12 @@ public class Task {
         this.name = name;
     }
 
-    public String getNotes() {
-        return notes;
+    public boolean getPrivacy() {
+        return privacy;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setPrivacy(boolean privacy) {
+        this.privacy = privacy;
     }
 
     public Date getCreatedAt() {
@@ -85,10 +75,5 @@ public class Task {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    public Project getProject() { return project; }
-
-    public void setProject(Project project) { this.project = project; }
-
-
 }
+
