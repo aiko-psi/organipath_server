@@ -40,7 +40,7 @@ public class TaskController {
         }).orElseThrow(() -> new ResourceNotFoundException("Project", "projectId", projectId));
     }
 
-    // Get a Single Note (not in te
+    // Get a Single Note (not in the tutorial)
     @GetMapping("projects/{projectId}/tasks/{taskId}")
     public Task getTaskById(@PathVariable (value = "projectId") Long projectId,
                             @PathVariable (value = "taskId") Long taskId,

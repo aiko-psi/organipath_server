@@ -7,7 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "projects")
@@ -25,7 +25,6 @@ public class Project {
 
     private boolean privacy;
 
-
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
@@ -35,6 +34,13 @@ public class Project {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
+
+    @OneToMany(
+            mappedBy = "project",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Task> tasks;
 
     public Long getProjectId() {
         return id;
@@ -75,5 +81,11 @@ public class Project {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public List<Task> getTasks() { return tasks; }
+
+    public void setTasks(List<Task> tasks) { this.tasks = tasks; }
+
+    public void addTask(Task task) {this.tasks.add(task); }
 }
 

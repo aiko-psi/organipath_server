@@ -7,7 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
+import java.util.*;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -44,6 +44,19 @@ public class Task {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "task_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Task parent;
+
+    @OneToMany(
+            mappedBy = "parent",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Task> substaks;
 
 
     public Long getId() {
@@ -90,5 +103,13 @@ public class Task {
 
     public void setProject(Project project) { this.project = project; }
 
+    public Task getParent() { return parent; }
 
+    public void setParent(Task parent) { this.parent = parent; }
+
+    public List<Task> getSubstaks() { return substaks; }
+
+    public void setSubstaks(List<Task> substaks) { this.substaks = substaks; }
+
+    public void addSubtask(Task task) { this.substaks.add(task); }
 }
