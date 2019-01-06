@@ -24,23 +24,34 @@ public class TaskController {
     @Autowired
     ProjRepository projectRepository;
 
-    // Get All Notes
+    // Get All Tasks of one Project
     @GetMapping("/projects/{projectId}/tasks")
     public Page<Task> getAllTasks(@PathVariable (value = "projectId") Long projectId,
                                   Pageable pageable) {
         return taskRepository.findByProjectId(projectId, pageable);
     }
 
-    // / Create a new Note
-    @PostMapping("/projects/{projectId}/tasks")
-    public Task createTask(@PathVariable (value = "projectId") Long projectId, @Valid @RequestBody Task task) {
+    // / Create a new Task
+    @PostMapping("/projects/{projectId}/parent/{parentId}/tasks")
+    public Task createTask(@PathVariable (value = "projectId") Long projectId,
+                           @PathVariable (value = "parentId") Long parentId,
+                           @Valid @RequestBody Task task) {
+        if(!projectRepository.existsById(projectId)) {
+            throw new ResourceNotFoundException("Project", "id", projectId);
+        }
+
+        if(parentId!= 0 && !taskRepository.existsById(parentId)) {
+            throw new ResourceNotFoundException("Task", "id", parentId);
+        }
+
         return projectRepository.findById(projectId).map(project -> {
             task.setProject(project);
+            this.setParent(parentId, task);
             return taskRepository.save(task);
         }).orElseThrow(() -> new ResourceNotFoundException("Project", "projectId", projectId));
     }
 
-    // Get a Single Note (not in the tutorial)
+    // Get a Single Task (not in the tutorial)
     @GetMapping("projects/{projectId}/tasks/{taskId}")
     public Task getTaskById(@PathVariable (value = "projectId") Long projectId,
                             @PathVariable (value = "taskId") Long taskId,
@@ -53,23 +64,31 @@ public class TaskController {
                 .orElseThrow(() -> new ResourceNotFoundException("Task", "taskId", taskId));
     }
 
-    @PutMapping("projects/{projectId}/tasks/{taskId}")
+    // Update a Task
+    // if there is the Param "parentId" change this too, else leave the parent alone
+    @PutMapping("projects/{projectId}/parent/{parentId}/tasks/{taskId}")
     public Task updateTask(@PathVariable (value = "projectId") Long projectId,
                            @PathVariable (value = "taskId") Long taskId,
-                                 @Valid @RequestBody Task taskRequest) {
+                           @PathVariable (value = "parentId") Long parentId,
+                           @Valid @RequestBody Task taskRequest) {
         if(!projectRepository.existsById(projectId)) {
             throw new ResourceNotFoundException("Project", "id", projectId);
+        }
+
+        if(parentId!= 0 && !taskRepository.existsById(parentId)) {
+            throw new ResourceNotFoundException("Task", "id", parentId);
         }
 
         return taskRepository.findById(taskId).map(task -> {
             task.setName(taskRequest.getName());
             task.setNotes(taskRequest.getNotes());
+            this.setParent(parentId, task);
             return taskRepository.save(task);
         }).orElseThrow(() -> new ResourceNotFoundException("Task", "id", taskId));
     }
 
 
-    // Delete a Note
+    // Delete a Task
     @DeleteMapping("/projects/{projectId}/tasks/{taskId}")
     public ResponseEntity<?> deleteTask(@PathVariable(value = "projectId") Long projectId,
                                         @PathVariable(value = "taskId") Long taskId) {
@@ -83,6 +102,42 @@ public class TaskController {
             return ResponseEntity.ok().build();
         }).orElseThrow(() -> new ResourceNotFoundException("Task", "taskId", taskId));
     }
+
+    // Get All Subtasks
+    @GetMapping("/projects/{projectId}/parent/{taskId}/subtasks")
+    public Page<Task> getAllSubtasks(@PathVariable (value = "projectId") Long projectId,
+                                     @PathVariable(value = "taskId") Long taskId,
+                                     Pageable pageable) {
+        return taskRepository.findByParentId(taskId, pageable);
+    }
+
+    // / Create a new Subtask
+    @PostMapping("/projects/{projectId}/parent/{taskId}/subtasks")
+    public Task createSubtask(@PathVariable (value = "projectId") Long projectId,
+                              @PathVariable(value = "taskId") Long taskId,
+                              @Valid @RequestBody Task task) {
+        return taskRepository.findById(taskId).map(parent -> {
+            task.setProject(parent.getProject()); //add test here!
+            task.setParent(parent);
+            return taskRepository.save(task);
+        }).orElseThrow(() -> new ResourceNotFoundException("Task", "taskId", taskId));
+    }
+
+
+    public Task setParent(Long parentId, Task task){
+        if (parentId == 0){
+            task.setParent(null);
+            return task;
+        }else {
+            taskRepository.findById(parentId).map(parentTask -> {
+                task.setParent(parentTask);
+                return task;
+            }).orElseThrow(() -> new ResourceNotFoundException("Task", "ParentId", parentId));
+            return task;
+        }
+    }
+
+
 
 
 }

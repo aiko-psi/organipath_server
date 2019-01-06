@@ -20,7 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
         allowGetters = true)
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column()
     private Long id;
 
     @NotBlank
@@ -45,9 +46,9 @@ public class Task {
     @JsonIgnore
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "task_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(columnDefinition="integer", name = "task_id",  nullable=true, insertable=true, updatable=true)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Task parent;
 
@@ -59,13 +60,9 @@ public class Task {
     private List<Task> substaks;
 
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() {
         return name;

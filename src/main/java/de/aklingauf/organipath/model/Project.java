@@ -42,11 +42,11 @@ public class Project {
     )
     private List<Task> tasks;
 
-    public Long getProjectId() {
+    public Long getId() {
         return id;
     }
 
-    public void setProjectId(Long projectId) {
+    public void setId(Long projectId) {
         this.id = projectId;
     }
 

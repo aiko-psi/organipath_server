@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Page<Task> findByProjectId(Long projectId, Pageable pageable);
 
+    Page<Task> findByParentId(Long parentId, Pageable pageable);
+    // why the fuck ist der name der Funktion ausschlaggebend?! findByTaskId geht nicht, findByPartentID schon
+
 }

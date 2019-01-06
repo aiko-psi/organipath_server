@@ -51,5 +51,4 @@ public class ProjectController {
         }).orElseThrow(() -> new ResourceNotFoundException("Task", "id", projectId));
     }
 
-
 }
