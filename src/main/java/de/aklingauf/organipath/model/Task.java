@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
+import javax.persistence.*;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"createdAt", "updatedAt"},
+@JsonIgnoreProperties(value = {"createdAt", "updatedAt", "subtasks"},
         allowGetters = true)
 public class Task {
     @Id
@@ -40,24 +41,32 @@ public class Task {
     @LastModifiedDate
     private Date updatedAt;
 
+    @Column(name= "parent_project_id")
+    private Long projectId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false)
+    @JoinColumn(name = "project_id", nullable = false) //, referencedColumnName = "parent_project_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(columnDefinition="integer", name = "task_id",  nullable=true, insertable=true, updatable=true)
+    @JoinColumn(columnDefinition="integer", name = "parent_task_id",  nullable=true, insertable=true, updatable=true)
+            //referencedColumnName = "parent_id")
     //@OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Task parent;
+
+    @Column(name= "parent_id")
+    private Long parentId;
 
     @OneToMany(
             mappedBy = "parent",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Task> substaks;
+    @JsonIgnore
+    private List<Task> subtasks;
 
 
     public Long getId() { return id; }
@@ -104,9 +113,18 @@ public class Task {
 
     public void setParent(Task parent) { this.parent = parent; }
 
-    public List<Task> getSubstaks() { return substaks; }
+    public List<Task> getSubstaks() { return subtasks; }
 
-    public void setSubstaks(List<Task> substaks) { this.substaks = substaks; }
+    public void setSubstaks(List<Task> substaks) { this.subtasks = substaks; }
 
-    public void addSubtask(Task task) { this.substaks.add(task); }
+    public void addSubtask(Task task) { this.subtasks.add(task); }
+
+    public Long getProjectId() { return projectId; }
+
+    public void setProjectId(Long projectId) { this.projectId = projectId; }
+
+    public Long getParentId() { return parentId; }
+
+    public void setParentId(Long parentId) { this.parentId = parentId; }
+
 }

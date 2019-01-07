@@ -5,12 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     Page<Task> findByProjectId(Long projectId, Pageable pageable);
 
     Page<Task> findByParentId(Long parentId, Pageable pageable);
-    // why the fuck ist der name der Funktion ausschlaggebend?! findByTaskId geht nicht, findByPartentID schon
+    // parentId because Spring generates this automatically
 
 }
