@@ -9,6 +9,7 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath "gradle.plugin.com.scalified.plugins.gradle:metamodel:0.0.1"
+		
 	}
 }
 
@@ -52,5 +53,9 @@ dependencies {
 	compile('mysql:mysql-connector-java')
 	compile('org.hibernate:hibernate-core:5.3.6.Final')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile("org.springframework.boot:spring-boot-starter-security")
 	//compile group: 'javax.persistence', name: 'persistence-api', version: '1.0'
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
 }
