@@ -1,10 +1,14 @@
 package de.aklingauf.organipath.controller;
 
+import de.aklingauf.organipath.checks.AuthChecker;
 import de.aklingauf.organipath.exception.ResourceNotFoundException;
 import de.aklingauf.organipath.model.Task;
+import de.aklingauf.organipath.model.User;
 import de.aklingauf.organipath.repository.TaskRepository;
 import de.aklingauf.organipath.repository.ProjRepository;
 import de.aklingauf.organipath.repository.TaskSpecifications;
+import de.aklingauf.organipath.security.CurrentUser;
+import de.aklingauf.organipath.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,37 +30,64 @@ public class TaskController {
     @Autowired
     ProjRepository projectRepository;
 
+    AuthChecker authChecker;
+
     // Get All Tasks that belong to one Project
     @GetMapping("/projects/{projectId}/alltasks")
-    public Page<Task> getAllTasks(@PathVariable (value = "projectId") Long projectId,
+    public Page<Task> getAllTasks(@CurrentUser UserPrincipal currentUser,
+                                  @PathVariable (value = "projectId") Long projectId,
                                   Pageable pageable) {
+
+        authChecker.checkProject(projectId, currentUser);
+
         return taskRepository.findByProjectId(projectId, pageable);
     }
 
     //Get all direct children tasks of one project
     @GetMapping("/projects/{projectId}/tasks")
-    public List<Task> getProjectTasks(@PathVariable (value = "projectId") Long projectId,
+    public List<Task> getProjectTasks(@CurrentUser UserPrincipal currentUser,
+                                      @PathVariable (value = "projectId") Long projectId,
                                   Pageable pageable) {
+
+        authChecker.checkProject(projectId, currentUser);
+
         return taskRepository.findAll(TaskSpecifications.isDirectChildOf(0L)
                 .and(TaskSpecifications.isInProject(projectId)));
     }
 
     // Get All direct Subtasks of one Task
     @GetMapping("/projects/{projectId}/tasks/{taskId}/subtasks")
-    public List<Task> getAllSubtasks(@PathVariable (value = "projectId") Long projectId,
+    public List<Task> getAllSubtasks(@CurrentUser UserPrincipal currentUser,
+                                     @PathVariable (value = "projectId") Long projectId,
                                      @PathVariable(value = "taskId") Long taskId,
                                      Pageable pageable) {
+
+        authChecker.checkTaskAndProject(taskId,projectId,currentUser);
+
         return taskRepository.findAll(TaskSpecifications.isDirectChildOf(taskId)
                 .and(TaskSpecifications.isInProject(projectId)));
     }
 
+    // Get a Single Task (not in the tutorial)
+    @GetMapping("projects/{projectId}/tasks/{taskId}")
+    public Task getTaskById(@CurrentUser UserPrincipal currentUser,
+                            @PathVariable (value = "projectId") Long projectId,
+                            @PathVariable (value = "taskId") Long taskId,
+                            Pageable pageable) {
+
+        authChecker.checkTaskAndProject(taskId,projectId,currentUser);
+
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task", "taskId", taskId));
+    }
+
     // / Create a new Task
     @PostMapping("/projects/{projectId}/tasks")
-    public Task createTask(@PathVariable (value = "projectId") Long projectId,
+    public Task createTask(@CurrentUser UserPrincipal currentUser,
+                           @PathVariable (value = "projectId") Long projectId,
                            @Valid @RequestBody Task task) {
-        if(!projectRepository.existsById(projectId)) {
-            throw new ResourceNotFoundException("Project", "id", projectId);
-        }
+
+        authChecker.checkProject(projectId, currentUser);
 
         return projectRepository.findById(projectId).map(project -> {
             task.setProject(project);
@@ -66,27 +97,14 @@ public class TaskController {
         }).orElseThrow(() -> new ResourceNotFoundException("Project", "projectId", projectId));
     }
 
-    // Get a Single Task (not in the tutorial)
-    @GetMapping("projects/{projectId}/tasks/{taskId}")
-    public Task getTaskById(@PathVariable (value = "projectId") Long projectId,
-                            @PathVariable (value = "taskId") Long taskId,
-                            Pageable pageable) {
-        if(!projectRepository.existsById(projectId)) {
-            throw new ResourceNotFoundException("Project", "projectId", projectId);
-        }
-
-        return taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task", "taskId", taskId));
-    }
-
     // Update a Task
     @PutMapping("projects/{projectId}/tasks/{taskId}")
-    public Task updateTask(@PathVariable (value = "projectId") Long projectId,
+    public Task updateTask(@CurrentUser UserPrincipal currentUser,
+                           @PathVariable (value = "projectId") Long projectId,
                            @PathVariable (value = "taskId") Long taskId,
                            @Valid @RequestBody Task taskRequest) {
-        if(!projectRepository.existsById(projectId)) {
-            throw new ResourceNotFoundException("Project", "id", projectId);
-        }
+
+        authChecker.checkTaskAndProject(taskId, projectId, currentUser);
 
         return taskRepository.findById(taskId).map(task -> {
             task.setName(taskRequest.getName());
@@ -100,12 +118,11 @@ public class TaskController {
 
     // Delete a Task
     @DeleteMapping("/projects/{projectId}/tasks/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable(value = "projectId") Long projectId,
+    public ResponseEntity<?> deleteTask(@CurrentUser UserPrincipal currentUser,
+                                        @PathVariable(value = "projectId") Long projectId,
                                         @PathVariable(value = "taskId") Long taskId) {
 
-        if(!projectRepository.existsById(projectId)) {
-            throw new ResourceNotFoundException("Project", "projectId", projectId);
-        }
+        authChecker.checkTaskAndProject(taskId, projectId, currentUser);
 
         return taskRepository.findById(taskId).map(task -> {
             taskRepository.delete(task);
@@ -114,16 +131,14 @@ public class TaskController {
     }
 
 
-    public Task setTaskParent(Long parentId, Task task){
+    private void setTaskParent(Long parentId, Task task){
         if (parentId == 0){
             task.setParent(null);
-            return task;
         }else {
             taskRepository.findById(parentId).map(parentTask -> {
                 task.setParent(parentTask);
                 return task;
             }).orElseThrow(() -> new ResourceNotFoundException("Task", "ParentId", parentId));
-            return task;
         }
     }
 

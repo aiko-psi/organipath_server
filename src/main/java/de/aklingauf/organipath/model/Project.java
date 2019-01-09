@@ -3,17 +3,20 @@ package de.aklingauf.organipath.model;
 // from Tutorial https://www.callicoder.com/spring-boot-rest-api-tutorial-with-mysql-jpa-hibernate/
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Entity
 @Table(name = "projects")
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"createdAt", "updatedAt"},
+@JsonIgnoreProperties(value = {"createdAt", "updatedAt", "tasks", "user"},
         allowGetters = true)
 
 public class Project {
@@ -35,6 +38,14 @@ public class Project {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_user_id", nullable = false) //, referencedColumnName = "parent_project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private User owner;
+
+    private Long ownerId;
 
     @OneToMany(
             mappedBy = "project",
@@ -89,5 +100,13 @@ public class Project {
     public void setTasks(List<Task> tasks) { this.tasks = tasks; }
 
     public void addTask(Task task) {this.tasks.add(task); }
+
+    public User getOwner() { return owner; }
+
+    public void setOwner(User owner) { this.owner = owner; }
+
+    public Long getOwnerId() { return ownerId; }
+
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }
 

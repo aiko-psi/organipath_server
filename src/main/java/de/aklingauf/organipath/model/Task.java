@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.*;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -42,6 +43,7 @@ public class Task {
     private Date updatedAt;
 
     @Column(name= "parent_project_id")
+    @NotNull
     private Long projectId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -53,7 +55,7 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(columnDefinition="integer", name = "parent_task_id",  nullable=true, insertable=true, updatable=true)
             //referencedColumnName = "parent_id")
-    //@OnDelete(action = OnDeleteAction.CASCADE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Task parent;
 

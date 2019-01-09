@@ -1,4 +1,5 @@
 package de.aklingauf.organipath.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -59,6 +60,14 @@ public class User {
     @LastModifiedDate
     private Date updatedAt;
 
+    @OneToMany(
+            mappedBy = "owner",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<Project> projects;
+
     public User() {
 
     }
@@ -103,5 +112,9 @@ public class User {
     public Date getUpdatedAt() { return updatedAt; }
 
     public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+
+    public List<Project> getProjects() { return projects; }
+
+    public void setProjects(List<Project> projects) { this.projects = projects; }
 
 }
