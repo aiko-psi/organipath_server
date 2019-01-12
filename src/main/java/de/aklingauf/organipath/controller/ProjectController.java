@@ -9,7 +9,6 @@ import de.aklingauf.organipath.repository.UserRepository;
 import de.aklingauf.organipath.security.CurrentUser;
 import de.aklingauf.organipath.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
@@ -28,8 +27,7 @@ public class ProjectController {
     AuthChecker authChecker;
 
     @GetMapping("/projects")
-    public List<Project> getAllProjects(@CurrentUser UserPrincipal currentUser,
-                                        Pageable pagale){
+    public List<Project> getAllProjects(@CurrentUser UserPrincipal currentUser){
         return projectRepository.findAll(ProjectSpecifications.isOwnedBy(currentUser));
     }
 

@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 
@@ -34,20 +32,18 @@ public class TaskController {
 
     // Get All Tasks that belong to one Project
     @GetMapping("/projects/{projectId}/alltasks")
-    public Page<Task> getAllTasks(@CurrentUser UserPrincipal currentUser,
-                                  @PathVariable (value = "projectId") Long projectId,
-                                  Pageable pageable) {
+    public List<Task> getAllTasks(@CurrentUser UserPrincipal currentUser,
+                                  @PathVariable (value = "projectId") Long projectId) {
 
         authChecker.checkProject(projectId, currentUser);
 
-        return taskRepository.findByProjectId(projectId, pageable);
+        return taskRepository.findByProjectId(projectId);
     }
 
     //Get all direct children tasks of one project
     @GetMapping("/projects/{projectId}/tasks")
     public List<Task> getProjectTasks(@CurrentUser UserPrincipal currentUser,
-                                      @PathVariable (value = "projectId") Long projectId,
-                                  Pageable pageable) {
+                                      @PathVariable (value = "projectId") Long projectId) {
 
         authChecker.checkProject(projectId, currentUser);
 
@@ -59,8 +55,7 @@ public class TaskController {
     @GetMapping("/projects/{projectId}/tasks/{taskId}/subtasks")
     public List<Task> getAllSubtasks(@CurrentUser UserPrincipal currentUser,
                                      @PathVariable (value = "projectId") Long projectId,
-                                     @PathVariable(value = "taskId") Long taskId,
-                                     Pageable pageable) {
+                                     @PathVariable(value = "taskId") Long taskId) {
 
         authChecker.checkTaskAndProject(taskId,projectId,currentUser);
 
@@ -72,8 +67,7 @@ public class TaskController {
     @GetMapping("projects/{projectId}/tasks/{taskId}")
     public Task getTaskById(@CurrentUser UserPrincipal currentUser,
                             @PathVariable (value = "projectId") Long projectId,
-                            @PathVariable (value = "taskId") Long taskId,
-                            Pageable pageable) {
+                            @PathVariable (value = "taskId") Long taskId) {
 
         authChecker.checkTaskAndProject(taskId,projectId,currentUser);
 
