@@ -13,4 +13,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     List<Task> findByParentId(Long parentId);
     // parentId because Spring generates this automatically
 
+
+
 }

@@ -75,8 +75,8 @@ public class AuthController {
         }
 
         // hard coded voucher for invitation
-        if(signUpRequest.getVoucher() == "0264/V!947#") {
-            return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
+        if(signUpRequest.getVoucher().equals("0264/V!947#")) {
+            return new ResponseEntity(new ApiResponse(false, "Voucher invalid"),
                     HttpStatus.BAD_REQUEST);
         }
 

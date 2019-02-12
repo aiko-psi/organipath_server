@@ -2,6 +2,7 @@ package de.aklingauf.organipath.model;
 
 // from Tutorial https://www.callicoder.com/spring-boot-rest-api-tutorial-with-mysql-jpa-hibernate/
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -31,6 +32,17 @@ public class Task {
 
     private String notes;
 
+    private boolean mini;
+
+    private boolean draft;
+
+    private boolean fun;
+
+    private Date daily;
+
+    private Date deadline;
+
+    private long dangerZone;
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -71,9 +83,22 @@ public class Task {
     private List<Task> subtasks;
 
 
-    public Long getId() { return id; }
+    @OneToMany(
+            mappedBy = "task",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<Change> statChanges;
 
-    public void setId(Long id) { this.id = id; }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -89,6 +114,54 @@ public class Task {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public boolean isMini() {
+        return mini;
+    }
+
+    public void setMini(boolean mini) {
+        this.mini = mini;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
+    }
+
+    public boolean isFun() {
+        return fun;
+    }
+
+    public void setFun(boolean fun) {
+        this.fun = fun;
+    }
+
+    public Date getDaily() {
+        return daily;
+    }
+
+    public void setDaily(Date daily) {
+        this.daily = daily;
+    }
+
+    public Date getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
+    }
+
+    public long getDangerZone() {
+        return dangerZone;
+    }
+
+    public void setDangerZone(long dangerZone) {
+        this.dangerZone = dangerZone;
     }
 
     public Date getCreatedAt() {
@@ -107,26 +180,51 @@ public class Task {
         this.updatedAt = updatedAt;
     }
 
-    public Project getProject() { return project; }
+    public Long getProjectId() {
+        return projectId;
+    }
 
-    public void setProject(Project project) { this.project = project; }
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
 
-    public Task getParent() { return parent; }
+    public Project getProject() {
+        return project;
+    }
 
-    public void setParent(Task parent) { this.parent = parent; }
+    public void setProject(Project project) {
+        this.project = project;
+    }
 
-    public List<Task> getSubstaks() { return subtasks; }
+    public Task getParent() {
+        return parent;
+    }
 
-    public void setSubstaks(List<Task> substaks) { this.subtasks = substaks; }
+    public void setParent(Task parent) {
+        this.parent = parent;
+    }
 
-    public void addSubtask(Task task) { this.subtasks.add(task); }
+    public Long getParentId() {
+        return parentId;
+    }
 
-    public Long getProjectId() { return projectId; }
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
 
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    public List<Task> getSubtasks() {
+        return subtasks;
+    }
 
-    public Long getParentId() { return parentId; }
+    public void setSubtasks(List<Task> subtasks) {
+        this.subtasks = subtasks;
+    }
 
-    public void setParentId(Long parentId) { this.parentId = parentId; }
+    public List<Change> getStatChanges() {
+        return statChanges;
+    }
 
+    public void setStatChanges(List<Change> statChanges) {
+        this.statChanges = statChanges;
+    }
 }
