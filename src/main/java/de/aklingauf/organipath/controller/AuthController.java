@@ -8,6 +8,7 @@ import de.aklingauf.organipath.payload.JwtAuthenticationResponse;
 import de.aklingauf.organipath.payload.LoginRequest;
 import de.aklingauf.organipath.payload.SignUpRequest;
 import de.aklingauf.organipath.repository.UserRepository;
+import de.aklingauf.organipath.security.CustomUserDetailsService;
 import de.aklingauf.organipath.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,9 +48,13 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        // some authentication magic here
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsernameOrEmail(),
@@ -58,25 +64,31 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // token generation and getting the user details
         String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUsernameOrEmail());
+
+        // return token and username as a JwtAuthenticationResponse format
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userDetails.getUsername()));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+
+        // first check if the username and email are not already taken
         if(userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),
+            return new ResponseEntity<>(new ApiResponse(false, "Username is already taken!"),
                     HttpStatus.BAD_REQUEST);
         }
 
         if(userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
+            return new ResponseEntity<>(new ApiResponse(false, "Email Address already in use!"),
                     HttpStatus.BAD_REQUEST);
         }
 
-        // hard coded voucher for invitation
+        // hard coded voucher for invitation (because not everybody should use the app)
         if(signUpRequest.getVoucher().equals("0264/V!947#")) {
-            return new ResponseEntity(new ApiResponse(false, "Voucher invalid"),
+            return new ResponseEntity<>(new ApiResponse(false, "Voucher invalid"),
                     HttpStatus.BAD_REQUEST);
         }
 
