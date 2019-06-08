@@ -7,11 +7,11 @@ import de.aklingauf.organipath.model.User;
 public class JwtAuthenticationResponse {
     private String accessToken;
     private String tokenType = "Bearer";
-    private String currentUsername;
+    private User currentUser;
 
-    public JwtAuthenticationResponse(String accessToken, String currentUsername) {
+    public JwtAuthenticationResponse(String accessToken, User currentUser) {
         this.accessToken = accessToken;
-        this.currentUsername = currentUsername;
+        this.currentUser = currentUser;
     }
 
     public String getAccessToken() {
@@ -30,11 +30,11 @@ public class JwtAuthenticationResponse {
         this.tokenType = tokenType;
     }
 
-    public String getCurrentUsername() {
-        return currentUsername;
+    public User getCurrentUser() {
+        return currentUser;
     }
 
-    public void setCurrentUsername(String currentUsername) {
-        this.currentUsername = currentUsername;
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 }

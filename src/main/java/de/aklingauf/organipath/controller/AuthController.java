@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,10 +67,13 @@ public class AuthController {
 
         // token generation and getting the user details
         String jwt = tokenProvider.generateToken(authentication);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUsernameOrEmail());
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("User not found ")
+        );
 
         // return token and username as a JwtAuthenticationResponse format
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userDetails.getUsername()));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user));
     }
 
     @PostMapping("/signup")
