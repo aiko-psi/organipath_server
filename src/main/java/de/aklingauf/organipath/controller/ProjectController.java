@@ -24,6 +24,7 @@ public class ProjectController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
     AuthChecker authChecker;
 
     @GetMapping("/projects")

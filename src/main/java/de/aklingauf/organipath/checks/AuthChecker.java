@@ -6,7 +6,9 @@ import de.aklingauf.organipath.security.UserPrincipal;
 import de.aklingauf.organipath.repository.TaskRepository;
 import de.aklingauf.organipath.repository.ProjRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthChecker {
 
     @Autowired

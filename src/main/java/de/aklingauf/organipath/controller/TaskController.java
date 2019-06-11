@@ -28,6 +28,7 @@ public class TaskController {
     @Autowired
     ProjRepository projectRepository;
 
+    @Autowired
     AuthChecker authChecker;
 
     // Get All Tasks that belong to one Project

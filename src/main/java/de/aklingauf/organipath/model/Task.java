@@ -65,13 +65,13 @@ public class Task {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(columnDefinition="integer", name = "parent_task_id",  nullable=true, insertable=true, updatable=true)
+    @JoinColumn(name = "parent_id",  nullable=true, insertable=true, updatable=true)
             //referencedColumnName = "parent_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Task parent;
 
-    @Column(name= "parent_id")
+    @Column(name= "parent_task_id")
     private Long parentId;
 
     @OneToMany(
