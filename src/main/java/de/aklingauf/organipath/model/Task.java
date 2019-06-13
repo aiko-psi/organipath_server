@@ -32,6 +32,9 @@ public class Task {
 
     private String notes;
 
+    @NotBlank
+    private String status;
+
     private boolean mini;
 
     private boolean draft;
@@ -114,6 +117,14 @@ public class Task {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public boolean isMini() {
