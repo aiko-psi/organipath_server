@@ -58,19 +58,20 @@ public class TaskController {
                                      @PathVariable (value = "projectId") Long projectId,
                                      @PathVariable(value = "taskId") Long taskId) {
 
-        authChecker.checkTaskAndProject(taskId,projectId,currentUser);
+        authChecker.checkTaskAndProject(projectId, taskId, currentUser);
 
         return taskRepository.findAll(TaskSpecifications.isDirectChildOf(taskId)
                 .and(TaskSpecifications.isInProject(projectId)));
     }
 
     // Get a Single Task (not in the tutorial)
-    @GetMapping("projects/{projectId}/tasks/{taskId}")
+    @GetMapping("/projects/{projectId}/tasks/{taskId}")
     public Task getTaskById(@CurrentUser UserPrincipal currentUser,
                             @PathVariable (value = "projectId") Long projectId,
                             @PathVariable (value = "taskId") Long taskId) {
 
-        authChecker.checkTaskAndProject(taskId,projectId,currentUser);
+        authChecker.checkTaskAndProject(projectId, taskId, currentUser);
+        System.out.println("Test");
 
         return taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", "taskId", taskId));
@@ -93,13 +94,13 @@ public class TaskController {
     }
 
     // Update a Task
-    @PutMapping("projects/{projectId}/tasks/{taskId}")
+    @PutMapping("/projects/{projectId}/tasks/{taskId}")
     public Task updateTask(@CurrentUser UserPrincipal currentUser,
                            @PathVariable (value = "projectId") Long projectId,
                            @PathVariable (value = "taskId") Long taskId,
                            @Valid @RequestBody Task taskRequest) {
 
-        authChecker.checkTaskAndProject(taskId, projectId, currentUser);
+        authChecker.checkTaskAndProject(projectId, taskId, currentUser);
 
         return taskRepository.findById(taskId).map(task -> {
             task.setName(taskRequest.getName());
@@ -117,7 +118,7 @@ public class TaskController {
                                         @PathVariable(value = "projectId") Long projectId,
                                         @PathVariable(value = "taskId") Long taskId) {
 
-        authChecker.checkTaskAndProject(taskId, projectId, currentUser);
+        authChecker.checkTaskAndProject(projectId, taskId, currentUser);
 
         return taskRepository.findById(taskId).map(task -> {
             taskRepository.delete(task);
