@@ -103,10 +103,7 @@ public class TaskController {
         authChecker.checkTaskAndProject(projectId, taskId, currentUser);
 
         return taskRepository.findById(taskId).map(task -> {
-            task.setName(taskRequest.getName());
-            task.setNotes(taskRequest.getNotes());
-            task.setProjectId(projectId);
-            this.setTaskParent(task.getParentId(), task);
+            this.setTaskProperties(task, taskRequest);
             return taskRepository.save(task);
         }).orElseThrow(() -> new ResourceNotFoundException("Task", "id", taskId));
     }
@@ -136,6 +133,18 @@ public class TaskController {
                 return task;
             }).orElseThrow(() -> new ResourceNotFoundException("Task", "ParentId", parentId));
         }
+    }
+
+    private void setTaskProperties(Task task, Task taskRequest){
+        task.setName(taskRequest.getName());
+        task.setNotes(taskRequest.getNotes());
+        task.setStatus(taskRequest.getStatus());
+        task.setDaily(taskRequest.getDaily());
+        task.setDraft(taskRequest.isDraft());
+        task.setFun(taskRequest.isFun());
+        task.setMini(taskRequest.isMini());
+        task.setDangerZone(taskRequest.getDangerZone());
+        task.setDeadline(taskRequest.getDeadline());
     }
 
 
