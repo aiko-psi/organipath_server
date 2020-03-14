@@ -26,6 +26,7 @@ public abstract class Task_ {
 	public static volatile SingularAttribute<Task, Date> deadline;
 	public static volatile SingularAttribute<Task, Long> projectId;
 	public static volatile SingularAttribute<Task, Boolean> fun;
+	public static volatile SingularAttribute<Task, TaskState> status;
 	public static volatile SingularAttribute<Task, Date> updatedAt;
 
 	public static final String PARENT = "parent";
@@ -44,6 +45,7 @@ public abstract class Task_ {
 	public static final String DEADLINE = "deadline";
 	public static final String PROJECT_ID = "projectId";
 	public static final String FUN = "fun";
+	public static final String STATUS = "status";
 	public static final String UPDATED_AT = "updatedAt";
 
 }

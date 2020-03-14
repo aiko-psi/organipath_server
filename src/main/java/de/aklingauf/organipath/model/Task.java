@@ -33,7 +33,7 @@ public class Task {
     private String notes;
 
     @NotBlank
-    private String status;
+    private TaskState status;
 
     private boolean mini;
 
@@ -67,9 +67,8 @@ public class Task {
     @JsonIgnore
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "parent_id",  nullable=true, insertable=true, updatable=true)
-            //referencedColumnName = "parent_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Task parent;
@@ -119,11 +118,11 @@ public class Task {
         this.notes = notes;
     }
 
-    public String getStatus() {
+    public TaskState getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskState status) {
         this.status = status;
     }
 
